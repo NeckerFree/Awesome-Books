@@ -1,55 +1,37 @@
-class BookStore {
-    #books;
- 
-    #itemName;
- 
-    #booksCollection = [];
- 
-    constructor(itemName) {
-      this.#itemName = itemName;
+import Storage from './storage.js';
+
+const ITEM_STORAGE = 'books';
+/**
+ * Class to Add, Remove and Get books from Storage from
+ */
+export default class BookStore {
+  #booksCollection = [];
+
+  #bookStorage;
+
+  constructor() { this.#bookStorage = new Storage(ITEM_STORAGE); }
+
+  addBook= (author, title) => {
+    let id = 1;
+    this.#booksCollection = this.#bookStorage.getItemStorage();
+    if (this.#booksCollection !== null) {
+      const IDS = this.#booksCollection.map((object) => parseInt(object.id, 10));
+      const MAX_ID = Math.max(...IDS);
+      id = MAX_ID + 1;
     }
- 
-    addBook(author, title) {
-      let id = 1;
-      this.#booksCollection = this.getBookStorage();
-      if (this.#booksCollection !== null) {
-        const ids = this.#booksCollection.map((object) => parseInt(object.id, 10));
-        const maxId = Math.max(...ids);
-        id = maxId + 1;
-      }
-      const objectBook = { id: id.toString(), author, title };
-      this.setBookStorage(objectBook);
+    const objectBook = { id: id.toString(), author, title };
+    this.#bookStorage.setItemStorage(objectBook);
+  }
+
+  removeBook=(id) => {
+    if (id > 0) {
+      this.#booksCollection = this.#bookStorage.getItemStorage();
+      const result = this.#booksCollection.filter((b) => parseInt(b.id, 10) !== parseInt(id, 10));
+      this.#bookStorage.removeItemStorage(result);
     }
- 
-    removeBook(id) {
-      if (id > 0) {
-        this.#booksCollection = this.getBookStorage();
-        const result = this.#booksCollection.filter((b) => parseInt(b.id, 10) !== parseInt(id, 10));
-        this.removeBookStorage(result);
-      }
-    }
- 
-    getBookStorage() {
-      this.#books = localStorage.getItem(this.#itemName);
-      return (this.#books === null) ? null : JSON.parse(this.#books);
-    }
- 
-    setBookStorage(objectBook) {
-      if (this.#booksCollection === null) {
-        this.#booksCollection = [];
-      }
-      this.#booksCollection.push(objectBook);
-      this.#books = JSON.stringify(this.#booksCollection);
-      localStorage.setItem(this.#itemName, this.#books);
-    }
- 
-    removeBookStorage(booksResult) {
-      if (booksResult.length === 0) {
-        localStorage.removeItem(this.#itemName);
-      } else {
-        this.#books = JSON.stringify(booksResult);
-        localStorage.setItem(this.#itemName, this.#books);
-      }
-    }
- }
-export {BookStore};
+  }
+
+  getBooks=() => this.#bookStorage.getItemStorage();
+
+  storageAvailable=() => this.#bookStorage.storageAvailable();
+}
