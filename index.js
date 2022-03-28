@@ -34,7 +34,6 @@ const removeFromStore = (ev) => {
 };
 
 const setBooksForm = () => {
-  // bookStore.removeBook(-1);
   let booksCollection = [];
   booksCollection = bookStore.getBooks();
   let allBooks = '';
